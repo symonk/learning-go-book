@@ -184,3 +184,26 @@ func TestRuneUnicode(t *testing.T) {
 	// again - don't use int32 to represent runes in code, its confusing.
 	assert.True(t, asciiRune == asciiJRune)
 }
+
+// Golang does not support automatic type conversion between numeric types.
+// You must use explicit type conversions when types do not match.
+func TestTypeConversions(t *testing.T) {
+	var x int32 = 100
+	var y int64 = 200
+	// the int64 must be casted back to int32 for addition etc
+	// this is nice, it requires not memorisation for developers
+	// when everything if non same types must be casted.
+	result := x + int32(y)
+	assert.Equal(t, result, 300)
+}
+
+// The strictness around types has other implications.  Types in go cannot
+// be treated as a boolean, like in python with 'falsy' values.  The user
+// must be explicit.
+func TestBooleanCastingNotAllowed(t *testing.T) {
+	myInt := 0
+	myBool := myInt == 0
+	// casting the int to bool is not allowed and is a compile error
+	// b := bool(myInt)
+	assert.True(t, myBool)
+}
