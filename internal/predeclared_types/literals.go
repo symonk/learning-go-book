@@ -54,3 +54,8 @@ const (
 	// it could be a 32 bit or 64 bit integer.
 	myInt int = 99
 )
+
+// Which integer type to use?
+// If you are working with binary or network protocols, use integer specific sizes or signs.
+// If you are writing library functions that should work with any int type - use a generic custom function
+// otherwise just use `int`
