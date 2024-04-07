@@ -1,6 +1,7 @@
 package predeclared_types
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -57,4 +58,21 @@ func TestIntegerEquality(t *testing.T) {
 	assert.True(t, 100 < 500)
 	assert.True(t, 100 <= 100)
 	assert.True(t, 100 >= 100)
+}
+
+func TestFloatDifferences(t *testing.T) {
+	// Dividing a floating point number by 0 doesn't panic like integers
+	f := 10.95
+	divided := f / 0
+	// if the float is signed +INF:
+	assert.Equal(t, divided, math.Inf(1))
+	// if the float is unsigned -INF:
+	f2 := -10.95
+	assert.Equal(t, f2/0, math.Inf(-1))
+
+	// An explicit zero float divided returns Nan:
+	var f3 float64 = 0
+	_ = f3
+	// Dividing f3 by 0 would return Nan, however no two Nan instances
+	// are ever equal.
 }
