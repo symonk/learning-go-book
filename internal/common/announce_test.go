@@ -10,5 +10,5 @@ import (
 func TestAnnouncesCorrectly(t *testing.T) {
 	var buffer bytes.Buffer
 	AnnounceChapter(&buffer, 1, "foo")
-	assert.Equal(t, buffer.String(), "Chapter 1 - foo")
+	assert.Equal(t, buffer.String(), "Chapter 1: foo\n")
 }
