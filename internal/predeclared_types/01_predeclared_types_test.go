@@ -165,7 +165,7 @@ func TestStringComparison(t *testing.T) {
 	// Padded null bytes, \x00 is always considered lowest
 	// here ZZZZ has a padded null byte if the common prefix
 	// exists
-	assert.True(t, "AAAAA" < "AA")
+	assert.True(t, "AAAAA" > "AA")
 
 	// The above actually compares:
 	// AAAAA < AA\x00\x00\x00
@@ -194,7 +194,7 @@ func TestTypeConversions(t *testing.T) {
 	// this is nice, it requires not memorisation for developers
 	// when everything if non same types must be casted.
 	result := x + int32(y)
-	assert.Equal(t, result, 300)
+	assert.Equal(t, result, int32(300))
 }
 
 // The strictness around types has other implications.  Types in go cannot
@@ -207,3 +207,77 @@ func TestBooleanCastingNotAllowed(t *testing.T) {
 	// b := bool(myInt)
 	assert.True(t, myBool)
 }
+
+// In go, literals in go are untyped.  Go is practical and waits until
+// the developer assigns a type to them before enforcing the type.
+// There are multiple ways to define variables in go, these are:
+// using `var` - explicit and inclusive of the type
+// using `var` without a type, go will infer the type still
+// using `var` without a value - sets the `zero` value of that type
+// using `walrus :=` when inside a function block/scope
+func TestDeclaringVariables(t *testing.T) {
+	// full explicit var
+	var withVar int = 100
+	withoutVar := 100
+	assert.True(t, withVar == withoutVar)
+
+	// var no type
+	var withoutType = 100
+	assert.True(t, withoutType == withoutVar)
+
+	// inferred zero value for interger types
+	var zeroVal int
+	assert.True(t, zeroVal == 0)
+
+	var zeroStr string
+	assert.Empty(t, zeroStr)
+
+	walrus := "ok"
+	assert.IsType(t, "string", walrus)
+}
+
+// Multiple variables can be assigned on the same line
+func TestMultipleAssignment(t *testing.T) {
+	// multiple declarations
+	var a, b, c = 100, 200, "300"
+	assert.Equal(t, a, 100)
+	assert.Equal(t, b, 200)
+	assert.Equal(t, c, "300")
+
+	// multiple zero values
+	var i, j, k int32
+	assert.True(t, i+j+k == 0)
+
+	// Sizable, multiple line declaration with var
+	// This is known as a 'declaration list'
+	var (
+		w int
+		y string
+		x bool
+		z = true
+	)
+	assert.Equal(t, w, 0)
+	assert.Equal(t, y, "")
+	assert.Equal(t, x, false)
+	assert.True(t, z)
+}
+
+// Short hand variable assignment can be done with := without var for multiple vars
+// if atleast one of them is 'new'.  This can often lead to bugs, so should typically
+// be avoided.
+// := is not allowed outside of function scope
+// x := 100 would cause a compiler error here.
+func TestWalrusSpecifics(t *testing.T) {
+	x := 100
+	// assigning x here with := is also alright because y is 'new'.
+	y, x := 200, 300
+	assert.True(t, x-100 == y)
+}
+
+// So which style should you choose with variable declaration?
+// use var without a value if you need the default value intentionally
+// if you do not want the default inferred type for a variable, use the full var x int = ...
+// use := cautiously as it can create new variables when you do not expect it, causing shadowing
+// to occur and possible side effects.
+// opt for multiple variables using := only when fetching function return values, such as the comma ok
+// idiom.
