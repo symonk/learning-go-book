@@ -46,15 +46,24 @@ func TestExerciseTwo(t *testing.T) {
 // Write a program with three variables, b of type byte, smallI of type int32 and one
 // named bigI of type uint64.  Assign each variable the maximum legal value for its
 // type and then add 1 to each variable
-func exerciseThree() {
+func exerciseThree(writer io.Writer) {
 	var b byte = 255
 	var smallI int32 = 2147483647
-	var bigI uint64 = 9223372036854775807
+	var bigI uint64 = 18446744073709551615
 	b++
 	smallI++
 	bigI++
+	fmt.Fprintln(writer, b, smallI, bigI)
 }
 
 func TestExerciseThree(t *testing.T) {
-	exerciseThree()
+	/*
+		This is a really interesting one, the integer types outlined above 'wrap'
+		back to 0 in the case of bytes and unsigned ints.  In the case of signed
+		ints, they wrap up to the negative value, -2147483648 (ending 8 not 7!)
+		because the signed version is the range of (-2^32)->(2^32-1)
+	*/
+	var buffer bytes.Buffer
+	exerciseThree(&buffer)
+	assert.Equal(t, buffer.String(), "0 -2147483648 0\n")
 }
