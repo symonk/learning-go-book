@@ -57,7 +57,7 @@ const (
 	// A rune is a 32bit integer (not an unsigned integer like you might expect)
 	// Notice the odd assignment here to a character, it's actually a unicode code
 	// point under the hood.
-	myByte int32 = 'A'
+	myRune int32 = 'A'
 )
 
 // Which integer type to use?

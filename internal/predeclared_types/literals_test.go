@@ -33,3 +33,28 @@ func TestInt(t *testing.T) {
 	// below would be a compile error, mismatched types
 	// _ = my64 + my32
 }
+
+func TestIntegerOps(t *testing.T) {
+	assert.Equal(t, 100+200, 300)
+	assert.Equal(t, 100/2, 50)
+	assert.Equal(t, 100*5, 500)
+	assert.Equal(t, 100%2, 0)
+}
+
+func TestAugmentIntegerOps(t *testing.T) {
+	var x int
+	x += 100
+	x *= 2
+	x /= 50
+	x %= 3
+	assert.Equal(t, x, 1)
+}
+
+func TestIntegerEquality(t *testing.T) {
+	assert.True(t, 100 == 100)
+	assert.True(t, 100 != 99)
+	assert.True(t, 100 > 50)
+	assert.True(t, 100 < 500)
+	assert.True(t, 100 <= 100)
+	assert.True(t, 100 >= 100)
+}
