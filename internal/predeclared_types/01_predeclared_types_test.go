@@ -281,3 +281,32 @@ func TestWalrusSpecifics(t *testing.T) {
 // to occur and possible side effects.
 // opt for multiple variables using := only when fetching function return values, such as the comma ok
 // idiom.
+
+// Go has support for immutable variables using the `const` keyword.
+// Creating package scoped variables is typically a bad idea.  Introducing
+// global state creates hard to track down defects and also makes code
+// typically harder to test, be explicit and provide the necessary dependencies
+// to functions etc.
+// Some things may be ok in a global setting, such as a global logger instance
+// however other state and variable specifics that may be written too is bad
+// practice.
+
+const (
+	one   = 100
+	two   = "foo"
+	three = false
+	four  = 'A'
+)
+
+// compile error: one++
+// compile error: two += "foo"
+// compile error: three = true
+// compile error: four = 'X'
+
+// Constants work for some of the preclared types, however they do
+// support some additional things that can be verified by the compiler
+// such as:
+// len, cap, complex, real, image
+// expressions that consist of operators and the preceding values
+// slices, maps, arrays and structs are NOT immutable and there is no way
+// to even declare an immutable field/attribute type on a struct.
