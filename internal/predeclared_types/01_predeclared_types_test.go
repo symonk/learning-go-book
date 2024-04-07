@@ -310,3 +310,41 @@ const (
 // expressions that consist of operators and the preceding values
 // slices, maps, arrays and structs are NOT immutable and there is no way
 // to even declare an immutable field/attribute type on a struct.
+
+// constants like literals, can be typed or untyped.  There are good use cases
+// for both.  We will cover untyped here for now and one of the main benefits
+// is the increased flexibility.  Consider the scenario where you may want
+// to use the constant in mathematical operations against various different types
+const (
+	typedX   int = 100
+	untypedX     = 100
+)
+
+func TestUntypedConstants(t *testing.T) {
+	var y int32 = untypedX
+	_ = y
+
+	// not allowed! - compiler error
+	// var y int32 = typedX
+	// cannot use typedX (constant 100 of type int) as int32 value in variable
+}
+
+// A strict rule in go is that every declared local scoped variable MUST be read
+// or the compiler will complain.  In the long run this is good, in the short term
+// however can be painful, using the `_` identifier can solve some problems until
+// you have more scope and have figured out what you want to do
+
+const (
+	unread = "this isn't read but cause a compile time error, it is not function/local scoped"
+)
+
+func TestLocalReads(t *testing.T) {
+	x := 100
+	// compiler would fail if we stopped here, as nothing is reading `x`.
+	_ = x
+	// here we assigned x to the 'underscore' to signal we don't really care about it.
+
+	// Important: Package scoped vars (globals) do not enforce this read only check
+	// it is only inside function scope, the constant 'unread' is set above but does
+	// not break the compilation of this file!
+}
