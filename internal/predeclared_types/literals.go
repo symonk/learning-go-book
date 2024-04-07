@@ -53,6 +53,11 @@ const (
 	// `int` type is not platform agnostic, depending on CPU architecture
 	// it could be a 32 bit or 64 bit integer.
 	myInt int = 99
+
+	// A rune is a 32bit integer (not an unsigned integer like you might expect)
+	// Notice the odd assignment here to a character, it's actually a unicode code
+	// point under the hood.
+	myByte int32 = 'A'
 )
 
 // Which integer type to use?
