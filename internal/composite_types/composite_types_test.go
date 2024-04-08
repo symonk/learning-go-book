@@ -383,3 +383,27 @@ func TestSliceDeclaration(t *testing.T) {
 	// than planned, you won't have padded zero values.
 	_ = allowAppends
 }
+
+// Slicing expressions are smiliar to pythons 'slice' syntax
+// slices can be sliced with an (optional) start and (optional)
+// end position to make a sub slice.  This is shown below.
+func TestSliceSlicing(t *testing.T) {
+	s := []string{"foo", "bar", "baz"}
+	// capture everything except the first string
+	// stop is optional, if omitted will run to the end
+	assert.Equal(t, s[1:], []string{"bar", "baz"})
+	// capture everything upto stop.
+	assert.Equal(t, s[:2], []string{"foo", "bar"})
+
+	// The slicing start is INCLUSIVE, the stop is EXCLUSIVE
+	// Let's say we want to capture the 2nd, 3rd and 4th element
+	// of this slice below:
+	s1 := make([]int, 0, 5)
+	s1 = append(s1, 1, 2, 3, 4, 5)
+
+	// since the first element (start) is inclusive, we will look at index [1] (second element)
+	// since the last element (stop) is exclusive, we will look at index [4] (target -1)
+	expected := s1[1:4]
+	assert.Equal(t, expected, []int{2, 3, 4})
+
+}
