@@ -306,3 +306,42 @@ func TestCapacityAllocation(t *testing.T) {
 	// You can check the cap of arrays, but ofcourse it will always match the len
 	assert.True(t, len([1]int{1}) == cap([1]int{1}))
 }
+
+// We have seen two different ways to declare a slice, to recap:
+// x := []int{1} - slice ltieral
+// var y []int - nil zero value
+// Now we will look at a powerful built in, `make`.
+// make allows us to specify the TYPE, LENGTH, CAPACITY
+func TestMakingSlice(t *testing.T) {
+	s := make([]int, 100, 200)
+	assert.True(t, len(s) == 100)
+	assert.True(t, cap(s) == 200)
+
+	// s here actually has 100, zero valued integers
+	assert.True(t, s[99] == 0)
+	assert.True(t, s[0] == 0)
+}
+
+// WARNING: A common mistake is sizing up a slice, then
+// starting to append to it, forgetting that pre-population
+// of the zero value occur.
+func TestSliceCommonMistakeAppend(t *testing.T) {
+	s := make([]int, 10, 20)
+	// Here s is [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	// commonly you may think its 10 in length and append
+	// attempting to set the FIRST element
+	s = append(s, 2)
+
+	// This creates [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]
+	// not [2, 0, 0, 0, ...]
+	assert.True(t, s[10] == 2)
+	assert.True(t, s[0] == 0)
+
+	// As we touch on the capacity is 20 here, and under 256
+	// when we do the append exceeding length 10, no resizing
+	// would be necessary until we hit 21 capacity, then a
+	// resizin event would occur, causing a capcity of 40
+	s = append(s, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)
+	assert.True(t, len(s) == 21)
+	assert.True(t, cap(s) == 40)
+}
