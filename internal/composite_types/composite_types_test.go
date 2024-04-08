@@ -405,5 +405,60 @@ func TestSliceSlicing(t *testing.T) {
 	// since the last element (stop) is exclusive, we will look at index [4] (target -1)
 	expected := s1[1:4]
 	assert.Equal(t, expected, []int{2, 3, 4})
+}
 
+// When taking a slice of a slice, you are not creating a NEW slice.
+// but instead storing two variables pointing at the same memory address.
+// This creates some interesting behaviour, see below:
+func TestSlicingSliceMemory(t *testing.T) {
+	s := []int{1, 2, 3, 4, 5}
+	other := s[:5]
+	assert.Equal(t, s, other)
+
+	s[0] = 100
+	// We have modified s, notice how this change impacts other too
+	// the element at index 0 of both has changed, this is because
+	// they are just two variables pointer to the same underlying
+	// memory address.
+	assert.True(t, s[0] == 100)
+	assert.True(t, other[0] == 100)
+}
+
+// Another interesting piece of behaviour when slicing slices, is the
+// capacity on the new sub slice is set to the original slice, minus
+// the size of the new slice.
+func TestFunkySlicingAppendCapacity(t *testing.T) {
+	s := []string{"A", "B", "C", "D"}
+	// s has cap 4, len 4
+	assert.Equal(t, cap(s), len(s))
+	// y is a subslice of s, the first two elements.
+	y := s[:2]
+	assert.Equal(t, y, []string{"A", "B"})
+	// The new subslice is set to the cap of s, minus the starting index of y
+	// this translates to cap(s)[4] - 0
+	assert.True(t, cap(y) == 4)
+	// Anything after "B" in the original slice, is now shared between
+	// the two slices.  This gets weird when appending to the smaller slice.
+	y = append(y, "Foo")
+	// Looks ok for y:
+	assert.Equal(t, y, []string{"A", "B", "Foo"})
+	// what about s tho? you would expect it to be equal to []string{"A", "B", "C", "D", "Foo"} ?
+	// Not quite! the append can mistakenly update indexes of s unexpectidly.
+	assert.NotEqual(t, s, []string{"A", "B", "C", "D", "Foo"})
+	// This has actually overwritten the value in s[3] to be "Foo" due to the capacity.
+	assert.Equal(t, s, []string{"A", "B", "Foo", "D"})
+}
+
+// Essentially, be careful when subslicing slices.  How do we solve this problem?
+// There exists a final part of the slice expression, providing all is known as a
+// FULL slice expression, let's look at the same scenario using full slice expressions
+func TestFullSliceExpression(t *testing.T) {
+	s := []int{1, 2, 3, 4, 5}
+	// Set the start (0), stop (index 2) and how much capacity is available from the
+	// parent in the subslice.
+	s2 := s[:2:2]
+	assert.Equal(t, s2, []int{1, 2})
+	s2 = append(s2, 1000)
+	assert.Equal(t, s, []int{1, 2, 3, 4, 5})
+	assert.Equal(t, s2, []int{1, 2, 1000})
 }
