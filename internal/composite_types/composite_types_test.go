@@ -245,4 +245,11 @@ func TestSlicesAppend(t *testing.T) {
 	s = append(s, "Z")
 	s = append(s, []string{"D", "E", "F"}...)
 	assert.True(t, slices.Equal(s, []string{"A", "B", "C", "Z", "D", "E", "F"}))
+	// It is considered a compile time error if the return value of append
+	// is not assigned
+	s2 := []int{1}
+	// without _ =, this is a compile error: append(s2, 2)
+	_ = append(s2, 2)
+	// Notice how we didn't assign the append call back to s2
+	assert.Equal(t, s2, []int{1})
 }
