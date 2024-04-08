@@ -462,3 +462,41 @@ func TestFullSliceExpression(t *testing.T) {
 	assert.Equal(t, s, []int{1, 2, 3, 4, 5})
 	assert.Equal(t, s2, []int{1, 2, 1000})
 }
+
+// If you need a completely independent copy of a slice
+// the copy builtin/keyword can be used.
+// Again, there are some caveats - copy is dependent on
+// which slice is smallest
+
+func TestCopySlice(t *testing.T) {
+	// A demonstration on how to be burned by 'smallest' slice:
+	s1 := []int{1, 2, 3}
+	var s2 []int
+	n := copy(s2, s1)
+	// Here is the surprise, you'd expect len(3), the whole slice of s1 into s2? - NOPE!
+	// s2 is a nil slice with len 0
+	assert.Equal(t, n, 0)
+	assert.Empty(t, s2)
+
+	// How do we fix that?  Define the length atleast of s2 here;
+	// Let's try again, remember it will only fill upto the smallest
+	// amount of length, capacity doesn't matter here.
+	s2 = make([]int, len(s1))
+	n = copy(s2, s1)
+	assert.Equal(t, n, len(s1))
+	assert.Equal(t, s2, []int{1, 2, 3})
+
+	// Now to prove it is an actual copy
+	assert.True(t, &s1 != &s2)
+	s1 = append(s1, 100)
+	s2 = append(s2, 200)
+	assert.Equal(t, s1, []int{1, 2, 3, 100})
+	assert.Equal(t, s2, []int{1, 2, 3, 200})
+
+	// Finally, lets copy a subslice
+	a := []int{1, 2, 3}
+	b := make([]int, 2)
+	_ = copy(b, a)
+	assert.Equal(t, b, []int{1, 2})
+
+}
