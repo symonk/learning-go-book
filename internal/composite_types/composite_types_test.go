@@ -236,3 +236,13 @@ var sizedSlice = []string{"foo", "bar"}
 func TestLenOfSlice(t *testing.T) {
 	assert.True(t, len(sizedSlice) == 2)
 }
+
+// Builtin append with slices
+// here outlines how to append a single item, or shovel
+// anothher sequence
+func TestSlicesAppend(t *testing.T) {
+	s := []string{"A", "B", "C"}
+	s = append(s, "Z")
+	s = append(s, []string{"D", "E", "F"}...)
+	assert.True(t, slices.Equal(s, []string{"A", "B", "C", "Z", "D", "E", "F"}))
+}
