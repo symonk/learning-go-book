@@ -3,6 +3,7 @@ package composite_types
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -166,3 +167,72 @@ func TestArrCasting(t *testing.T) {
 }
 
 // ----- [Slices] -----
+
+// More often than not, when dealing with sequences for data structure, a slice
+// is what you want, over the array (tho not in 100% of cases!).  The slice is
+// a little more malleable and dynamic in nature.  The length of a slice (unlike)
+// arrays, is NOT part of it's type, and thus varying sizes of slices can be treated
+// somewhat equally at both compile and runtime.
+
+// Declaring slices is very similar to arrays:
+// An empty slice, size and cap of 0.
+// Notice we do NOT specify a size inside [...], that would be an array.
+var mySlice = []int32{}
+
+func TestBasicSlice(t *testing.T) {
+	assert.Len(t, mySlice, 0)
+	assert.True(t, cap(mySlice) == 0)
+
+	arrInit := [1]int32{1}
+	sliceInit := []int32{1}
+	_, _ = arrInit, sliceInit
+}
+
+// Just like arrays, you can specify the index to pre-populate
+// as always, the missing indexes receive the types zero value.
+var myPopulatedSlice = []int{0: 10, 1: 20, 2: 30, 4: 50}
+
+func TestPopulatedSlice(t *testing.T) {
+	assert.Equal(t, myPopulatedSlice[0], 10)
+	assert.Equal(t, myPopulatedSlice[1], 20)
+	assert.Equal(t, myPopulatedSlice[2], 30)
+	assert.Equal(t, myPopulatedSlice[3], 0)
+	assert.Equal(t, myPopulatedSlice[4], 50)
+}
+
+// Again just like arrays, multi dimensional slices are a thing
+// Notice we aren't populating anything here, so it uses the
+// default zero value for a slice, which is infact `nil`
+
+var multiDimensionSlice [][]int
+
+func TestDefaultNilSlice(t *testing.T) {
+	assert.Nil(t, multiDimensionSlice)
+}
+
+// Slices are NOT comparable, a stark difference from arrays
+// Slices can ONLY be compared to nil, explicitly.
+var uncomparable = []int{1, 2, 3}
+var otherSlice = []int{1, 2, 3}
+
+func TestCannotCompareSlice(t *testing.T) {
+	// compile error: result := uncomparable == otherSlice
+	// nil comparison is ok.
+	b := uncomparable == nil
+	assert.False(t, b)
+}
+
+// A recent feature in go 1.21+ above adds some new functionality to the
+// `slices` package for equality comparison.
+func TestCompareUsingSlicesPackage(t *testing.T) {
+	// Go 1.21+ only feature!
+	result := slices.Equal(uncomparable, otherSlice)
+	assert.True(t, result)
+}
+
+// Like arrays, builtin function len works nicely with slices
+var sizedSlice = []string{"foo", "bar"}
+
+func TestLenOfSlice(t *testing.T) {
+	assert.True(t, len(sizedSlice) == 2)
+}
