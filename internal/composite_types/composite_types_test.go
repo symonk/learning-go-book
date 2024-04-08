@@ -253,3 +253,56 @@ func TestSlicesAppend(t *testing.T) {
 	// Notice how we didn't assign the append call back to s2
 	assert.Equal(t, s2, []int{1})
 }
+
+// We haven't really touched on 'capacity' just yet in slices and arrays.
+// In go like most languages, sequence types array and slices utilise consecutive
+// memory blocks for storing data, this allows quick reading/writing capabilities.
+// The `len` of a slice is the number of consecutive memory blocks that currently
+// have a value.  The `cap|capacity` of a slice is the reserved blocks.
+// Appending to the slice, as long as the length is not greater than the capacity
+// is fine.  if you know what will be the fixed size of the slice, best to define
+// the capacity upfront.
+// HOWEVER, if the length is equal to the capacity and another append occurs, then
+// the go runtime must allocate a new backing array for the slice with a larger cap.
+// This is a 3 part process.  Allocate the new space, copy original array into that
+// new array, then append the new items onto the now increased slice.  This is
+// demonstrated below:
+// Note: The algorithm behind capacity scaling is outlined below.
+// Note: If you know how many slice elements will be set, size it right instantly
+// This will save all the resizing performance as you append on your way towards
+// the target, which on bigger slices can be quite costly.
+func TestCapacityAllocation(t *testing.T) {
+	empty := []int{}
+	assert.Len(t, empty, 0)
+	assert.Equal(t, cap(empty), 0)
+
+	// Here we are exceeding capacity, a new backing slice is allocated
+	// and empty originally copied in, then new appended values appended
+	// to the bigger blocks of consecutive memory.
+	// this is why append MUST be reassigned, it could be a completely different
+	// slice after the resizing etc.
+	// note: if reassigned, the old memory also needs to be garbage collected
+	// so we can't consider appending to a slice TRULY O(n) - occassionally its not.
+	empty = append(empty, 1)
+	assert.Len(t, empty, 1)
+	assert.Equal(t, cap(empty), 1)
+
+	// A few notes on capacity and resizing algorithms
+	// if the capacity of a slice is less than 256, double it
+	// otherwise increase it (current_capacity + 768)/4
+	// finally converging at around 25% growth.
+	// This is demonstrated somewhat below
+
+	start := []int{1}
+	// [1]
+	assert.True(t, len(start) == cap(start))
+	// [1 2]
+	start = append(start, 2)
+	assert.True(t, len(start) == cap(start))
+	// [1,2,3] but cap will be 4 not 3 as its resized 2x2
+	start = append(start, 3)
+	assert.Equal(t, len(start), 3)
+	assert.Equal(t, cap(start), 4)
+	// You can check the cap of arrays, but ofcourse it will always match the len
+	assert.True(t, len([1]int{1}) == cap([1]int{1}))
+}
