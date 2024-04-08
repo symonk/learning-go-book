@@ -345,3 +345,41 @@ func TestSliceCommonMistakeAppend(t *testing.T) {
 	assert.True(t, len(s) == 21)
 	assert.True(t, cap(s) == 40)
 }
+
+// Emptying a slice is easily possible using the `clear` builtin.
+// However, it may not be doing what you think it is!
+// Clearing the slice does NOT change the length, it resets the
+// slice to its types zero values of its current length!
+func TestSliceClearing(t *testing.T) {
+	s := make([]int, 100)
+	s[99] = 10
+	clear(s)
+	assert.True(t, s[99] == 0)
+	assert.True(t, len(s) == 100)
+}
+
+// Some simple rules of slice declaration
+// The main aim is to MINIMISE RE-ALLOCATIONS.
+func TestSliceDeclaration(t *testing.T) {
+	// if the slice will always remain nil
+	var alwaysNil []int
+
+	// a slice literal of capacity 0 does not equal a nil slice!
+	var notQuiteNil = []int{}
+	assert.NotEqual(t, alwaysNil, notQuiteNil)
+
+	// For a fixed slice size, using the literal is good
+	var fixed = []int{1, 2, 3, 4, 5}
+	_ = fixed
+
+	// if you know roughly what size it will be, but don't know the values
+	// use make or if using it as a buffer.
+	sureYouKnowValues := make([]int, 100)
+	_ = sureYouKnowValues
+
+	allowAppends := make([]string, 0, 100)
+	// This allows you append cleanly to the slice from 0
+	// without resizing, and if you end up with less elements
+	// than planned, you won't have padded zero values.
+	_ = allowAppends
+}
