@@ -500,3 +500,13 @@ func TestCopySlice(t *testing.T) {
 	assert.Equal(t, b, []int{1, 2})
 
 }
+
+// Slices and arrays can be converted between each other
+// This helps side step some limitations of the array
+// treating different sizes as different types when used
+// as function arguments
+func TestSliceFromArray(t *testing.T) {
+	a := [...]int{1, 2, 3}
+	s := a[:]
+	assert.Equal(t, s, []int{1, 2, 3})
+}
