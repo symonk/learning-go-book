@@ -510,3 +510,22 @@ func TestSliceFromArray(t *testing.T) {
 	s := a[:]
 	assert.Equal(t, s, []int{1, 2, 3})
 }
+
+// Similarly, slices can be converted to arrays
+func TestArrayFromSlice(t *testing.T) {
+	// The arr is created in new memory; so modifications to
+	// s, are not reflected.
+	s := []string{"foo", "bar", "baz"}
+	arr := [3]string(s)
+	assert.Equal(t, arr, [3]string{"foo", "bar", "baz"})
+
+	// it is possible to create from subsets
+	sub := []int{1, 2, 3, 4, 5}
+	subArr := [2]int(sub[:2])
+	assert.Len(t, subArr, 2)
+	assert.True(t, subArr[0] == 1)
+	assert.True(t, subArr[len(subArr)-1] == 2)
+
+	// it is a compile error to cast slice to array
+	// using the [...], the fixed size MUST be known.
+}
