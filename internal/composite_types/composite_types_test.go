@@ -550,3 +550,53 @@ func TestSliceToPointerArray(t *testing.T) {
 	assert.Equal(t, s[0], 100)
 	assert.Equal(t, a[0], 100)
 }
+
+// Strings, Runes & Bytes
+// You might think that a string in go is made out of runes like
+// some other languages and their 'character' equivalent, however
+// that is NOT the case in go.
+// Go uses a sequence of BYTES to represent a string, no particular
+// encoding is required, but the stdlib does often assume UTF-8.
+// Indexing single elements from the string, returns their byte
+// uint8 equivalent
+func TestExtractingValueFromString(t *testing.T) {
+	s := "hello world"
+	one := s[0]
+	last := s[len(s)-1]
+	assert.Equal(t, one, uint8(104))
+	assert.Equal(t, last, uint8(100))
+}
+
+// Slicing a string, returns a new substring - not the
+// bytes that was returned above.
+func TestSubString(t *testing.T) {
+	s := "foo"
+	s1 := s[:2]
+	assert.Equal(t, s1, "fo")
+}
+
+// Note: Strings in go are immutable, so substringing doesn't suffer memory issues slices have
+// HOWEVER, you will of noticed prior we receive the bytes when directly indexing the string
+// but in UTF-8 its quite common to have code points that exceed a single byte, basis ASCII
+// is single byte, but anything fancy goes into 2 and sometimes 4 byte code points.
+// Lets see what that means for indexing:
+func TestStringIndexingMultiByte(t *testing.T) {
+	s := "hello ॡ world"
+
+	// How long is this string, at a glance its 13
+	// but not quite, when theres multibyte code points
+	assert.Len(t, s, 15)
+
+	// Basic ascii start
+	start := s[:5]
+	assert.Equal(t, start, "hello")
+
+	// Basic ascii end
+	end := s[len(s)-5:]
+	assert.Equal(t, end, "world")
+
+	// Now the fun part, what is that 2 byte symbol in the middle
+	// the index in our string is [7]
+	codePoint := s[6:9]
+	assert.Equal(t, codePoint, "ॡ")
+}
