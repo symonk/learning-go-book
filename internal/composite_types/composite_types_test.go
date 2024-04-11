@@ -538,3 +538,15 @@ func TestCompilerCantCatchOversizingOnCast(t *testing.T) {
 	// compiler is happy with this, but it will panic at runtime.
 	// a := [20]int(s)
 }
+
+// Casting to a pointer of an array is also possible, slices are
+// considered reference types that hold a ptr to the underpinning
+// array, more on that later
+func TestSliceToPointerArray(t *testing.T) {
+	s := []int{1, 2, 3}
+	a := (*[3]int)(s)
+	// This creates shared storage!
+	s[0] = 100
+	assert.Equal(t, s[0], 100)
+	assert.Equal(t, a[0], 100)
+}
