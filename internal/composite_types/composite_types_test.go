@@ -529,3 +529,12 @@ func TestArrayFromSlice(t *testing.T) {
 	// it is a compile error to cast slice to array
 	// using the [...], the fixed size MUST be known.
 }
+
+// An interesting take on runtime panics regarding conversion
+func TestCompilerCantCatchOversizingOnCast(t *testing.T) {
+	s := []int{1, 2, 3, 4, 5}
+	assert.Len(t, s, 5)
+
+	// compiler is happy with this, but it will panic at runtime.
+	// a := [20]int(s)
+}
