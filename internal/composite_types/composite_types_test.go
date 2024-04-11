@@ -600,3 +600,40 @@ func TestStringIndexingMultiByte(t *testing.T) {
 	codePoint := s[6:9]
 	assert.Equal(t, codePoint, "ॡ")
 }
+
+// A single rune can be cast to a string
+// Even when the rune is a multie byte code point.
+func TestRuneToString(t *testing.T) {
+	r := 'ॡ'
+	s := string(r)
+	assert.Equal(t, s, "ॡ")
+}
+
+// Casting a byte to a string is also allowed
+// uint8 bytes are always, single byte however
+func TestByteToString(t *testing.T) {
+	var b byte = 'Y'
+	s := string(b)
+	assert.Equal(t, s, "Y")
+}
+
+// Convert an integer to a string would give you
+// character at that code point, not the literal
+// string value in ascii format.
+func TestIntToString(t *testing.T) {
+	// i := 65
+	// s := string(i)
+	// would be "A" in theory
+}
+
+// Strings can be converted back and forth to a slice of bytes.
+// or a slice of runes.
+func TestStringSliceConv(t *testing.T) {
+	s := "Hi ॡ"
+	b := []byte(s)
+	r := []rune(s)
+	// As you can see, once converted the multiple can be stored in a single rune
+	// however in the byte case, it takes 3 bytes
+	assert.Len(t, b, 6)
+	assert.Len(t, r, 4)
+}
