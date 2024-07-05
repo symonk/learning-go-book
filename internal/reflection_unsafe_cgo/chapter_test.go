@@ -34,3 +34,23 @@ func TestGettingTypeOfVar(t *testing.T) {
 	xType := reflect.TypeOf(&x)
 	assert.Equal(t, xType.Name(), "")
 }
+
+func TestReflectKind(t *testing.T) {
+	var x int
+	xPtr := reflect.TypeOf(&x)
+	assert.Equal(t, xPtr.Name(), "")
+	assert.Equal(t, xPtr.Kind(), reflect.Pointer)
+	assert.Equal(t, xPtr.Elem().Name(), "int")
+	assert.Equal(t, xPtr.Elem().Kind(), reflect.Int)
+}
+
+type TestStruct struct {
+	a int
+	b string
+	c []int
+	D map[string]int
+}
+
+func TestReflectionStructInspection(t *testing.T) {
+
+}
